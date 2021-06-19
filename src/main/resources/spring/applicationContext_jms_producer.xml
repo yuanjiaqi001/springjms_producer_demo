@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="com.offcn"/>
+<!--    1、创建一个真正的连接工厂，有JMS的厂家提供的-->
+    <bean class="org.apache.activemq.ActiveMQConnectionFactory" id="targetFactory">
+        <property name="brokerURL" value="tcp://192.168.188.128:61616"></property>
+    </bean>
+<!--    2、创建一个可操作的连接工厂，由Spring容器创建-->
+    <bean class="org.springframework.jms.connection.SingleConnectionFactory" id="singleConnectionFactory">
+        <property name="targetConnectionFactory" ref="targetFactory"/>
+    </bean>
+<!--    3、创建Template模板对象-->
+    <bean class="org.springframework.jms.core.JmsTemplate" id="jmsTemplate">
+        <property name="connectionFactory" ref="singleConnectionFactory"/>
+    </bean>
+<!--    4、创建一个点对点消息队列-->
+    <bean class="org.apache.activemq.command.ActiveMQQueue" id="queueTextDestination">
+        <constructor-arg value="dongyimai_sms_queue"/>
+    </bean>
+
+    <!--创建一个发布/订阅模式的消息队列-->
+    <bean class="org.apache.activemq.command.ActiveMQTopic" id="textTopicDesination">
+        <constructor-arg value="test_topic"/>
+    </bean>
+
+</beans>
